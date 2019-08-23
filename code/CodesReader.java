@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class CodesReader {
@@ -17,33 +18,24 @@ public class CodesReader {
 		codes = new HashMap<>();
 	}
 
-	public void codesRead(String[] filenames) {
-		boolean flag = false;
-		for(String filename: filenames) {
-			if(filename.indexOf(".java") == -1) {
-				flag = true;
-				System.out.println("指定されたファイルにjavaでないものが含まれています.");
-				break;
-			}
-			String className = filename.substring(filename.lastIndexOf("/")+1, filename.indexOf(".java"));
-			System.out.println("ClassName is \""+className+"\"");
+	public void codesRead(String filePaths){
+		String[] filePath = filePaths.split("/");
+		String fileName = filePath[filePath.length - 1];
+		if(fileName.indexOf(".java") == -1){
+			System.out.println("javaクラスでないファイルが読み込まれました");
+		}
+		else{
+			String className = fileName.split(".java")[0];
+			System.out.println("ClassName is " + className);
 			codes.put(className, new ClassElements());
+			makeCodes(filePaths, className);
 		}
-		if(!flag) {
-			for(String filename: filenames) {
-				makeCodes(filename);
-			}
-		}
+
 	}
 
-	/**
-	 * filenameクラスにClassElementsクラスにクラスの要素を追加する
-	 * @param filename
-	 */
-	public void makeCodes(String filename) {
-		String className = filename.substring(filename.lastIndexOf("/")+1, filename.indexOf(".java"));
+	public void makeCodes(String filePaths, String className) {
 		ClassElements ce = codes.get(className);
-		Path path = Paths.get(filename);
+		Path path = Paths.get(filePaths);
 		try(BufferedReader reader = Files.newBufferedReader(path)){
 			String line;
 			int count = -1;
