@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  csg_hack:
+    build: .
+    container_name: csg_hack
+    volumes:
+      - .:/team_2_1
+    command: /bin/bash
+    tty: true
+    stdin_open: true
