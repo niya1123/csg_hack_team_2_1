@@ -1,7 +1,3 @@
-FROM ubuntu
+FROM shinyay/docker-mvn-jdk8:3.5.0
 
 WORKDIR /team_2_1
-
-RUN apt-get -y update && apt-get install -y \
-    openjdk-8-jdk \
-    maven
