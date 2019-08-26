@@ -1,6 +1,5 @@
-FROM ubuntu
+FROM python
 
 WORKDIR /team_2_1
 
-RUN apt-get -y update && apt-get install -y \
-    openjdk-8-jdk
+RUN apt-get -y update
