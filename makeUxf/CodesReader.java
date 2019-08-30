@@ -69,6 +69,7 @@ public class CodesReader {
 				if(line.replace(" ","").replace("\n", "").equals("}"))
 					break;
 				count += search(line, '{');
+				count -= search(line, '}');
 				if(count < 0)
 					continue;
 				while(count != 0) {

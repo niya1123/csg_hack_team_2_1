@@ -1,5 +1,6 @@
 package makeUxf;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,13 +13,24 @@ public class MakeUxf {
 	}
 
 	public void uxf(String name) {
+		try {
+			make_uxf_dir();
+			FileWriter fw = new FileWriter(name+".uxf");
+			fw.write(made_xml());
+			fw.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public void make_uxf_dir(){
+		String path = new File(".").getAbsoluteFile().getParent();
         try {
-            FileWriter fw = new FileWriter(name+".uxf");
-            fw.write(made_xml());
-            fw.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+			File dir = new File(path+"/uxf");
+			dir.mkdir();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String made_xml() {

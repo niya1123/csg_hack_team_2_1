@@ -22,7 +22,6 @@ public class ClassElements {
 	}
 
 	public void addElemnts(String line) {
-
 		String comment="";
 		//コメント削除部
 		int a = 0,b,c = 0;
@@ -52,7 +51,7 @@ public class ClassElements {
 		line = line.replace("\n", "");
 
 		if(line.contains("{")||line.contains("abstract")||(!line.contains("final") && classType.get(0).equals("interface"))) {
-			line = line.replace("{", "").replace(";", "");
+			line = line.replace("{", "").replace("}", "").replace(";", "");
 			//メソッド
 			//[修飾子,isStatic,isAbstact,型,引数含むメソッド名,コメント]
 			if(line.contains("(")) {
