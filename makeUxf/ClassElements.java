@@ -13,12 +13,14 @@ public class ClassElements {
 	private String[] implementsClass;
 	private ArrayList<String[]> fileds; //[修飾子,isStatic,isFinal,型,フィールド名,コメント]
 	private ArrayList<String[]> methods; //[修飾子,isStatic,isAbstract,型,引数含むメソッド名,コメント]
+	private String className;
 
-	public ClassElements() {
+	public ClassElements(String className) {
 		classType = new ArrayList<>();
 		fileds = new ArrayList<>();
 		methods = new ArrayList<>();
 		implementsClass = null;
+		this.className = className;
 	}
 
 	public void addElemnts(String line) {
@@ -50,7 +52,7 @@ public class ClassElements {
 		//ソースコード分解部
 		line = line.replace("\n", "");
 
-		if(line.contains("{")||line.contains("abstract")||(!line.contains("final") && classType.get(0).equals("interface"))) {
+		if(line.contains("{")||line.contains("abstract")|| (!line.contains("final") && classType.get(0).equals("interface"))) {
 			line = line.replace("{", "").replace("}", "").replace(";", "");
 			//メソッド
 			//[修飾子,isStatic,isAbstact,型,引数含むメソッド名,コメント]
@@ -104,7 +106,7 @@ public class ClassElements {
 				String[] li = line.trim().replaceAll(" +", " ").split(" ");
 				ret[0] = access;
 				if(li.length == 1) {
-					if(classType.get(0).equals("enum")) {
+					if(classType.get(0).equals("enum") && !line.contains(className)) {
 						ret[5] = comment;
 						ret[3] = "enum";
 						ret[4] = li[0]+tmp;
@@ -169,7 +171,7 @@ public class ClassElements {
 			String[] li = line.trim().replaceAll(" +", " ").split(" ");
 			ret[0] = access;
 
-			if(classType.get(0).equals("enum")) {
+			if(classType.get(0).equals("enum") && (line.contains(",")||line.contains("(") && (!line.contains("Map")))) {
 				if(line.contains("("))
 					li = li[0].split(",");
 				String[] comments = {};

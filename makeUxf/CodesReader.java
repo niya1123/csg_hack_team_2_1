@@ -40,7 +40,7 @@ public class CodesReader {
 		else{
 			String className = fileName.split(".java")[0];
 			//System.out.println("ClassName is " + className);
-			codes.put(className, new ClassElements());
+			codes.put(className, new ClassElements(className));
 			makeCodes(filePaths, className);
 		}
 	}
