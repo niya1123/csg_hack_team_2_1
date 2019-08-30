@@ -1,4 +1,5 @@
-package code;
+package makeUxf;
+
 
 import java.util.ArrayList;
 /**
@@ -21,6 +22,7 @@ public class ClassElements {
 	}
 
 	public void addElemnts(String line) {
+
 		String comment="";
 		//コメント削除部
 		int a = 0,b,c = 0;
@@ -45,10 +47,12 @@ public class ClassElements {
 				line = line.replace(tmp, "");
 			}
 		}
+
 		//ソースコード分解部
 		line = line.replace("\n", "");
-		if(line.contains("{")||line.contains("abstract")) {
-			line = line.replace("{", "");
+
+		if(line.contains("{")||line.contains("abstract")||(!line.contains("final") && classType.get(0).equals("interface"))) {
+			line = line.replace("{", "").replace(";", "");
 			//メソッド
 			//[修飾子,isStatic,isAbstact,型,引数含むメソッド名,コメント]
 			if(line.contains("(")) {
@@ -65,26 +69,56 @@ public class ClassElements {
 				}else {
 					ret[2] = "false";
 				}
-				tmp = line.substring(line.indexOf("("),line.indexOf(")")+1);
+				StringBuffer str = new StringBuffer(line);
+				String alt_line = str.reverse().toString();
+				//tmp = line.substring(line.indexOf("("),line.indexOf(")")+1);
+				tmp = line.substring(line.indexOf("("),line.length() - alt_line.indexOf(")"));
 				line = line.replace(tmp, "");
+				String argument="";
+				ArrayList<String> l = new ArrayList<>();
+				if(tmp.length()!=2) {
+					String temp = tmp.substring(1,tmp.length()-1);
+					String[] tmp_split_comma = temp.trim().replaceAll(" +", " ").split(",");
+					for(String tsc : tmp_split_comma) {
+						String[] tsc_split_space = tsc.split(" ");
+						String type="";
+						for (int i = 0; i < tsc_split_space.length-1; i++) {
+							type += tsc_split_space[i];
+						}
+						String name = tsc_split_space[tsc_split_space.length-1];
+						l.add(name+": "+type);
+					}
+					argument = String.join(", ", l);
+				}
+				argument = "("+argument+")";
+
+
 				String[] li = line.trim().replaceAll(" +", " ").split(" ");
+
 				if("public private protected".contains(li[0])) {
 					if(li.length == 2) {
 						ret[0] = li[0];
-						ret[4] = li[1]+tmp;
+						ret[4] = li[1]+argument;
 					}
 					else {
 						ret[0] = li[0];
 						ret[3] = li[1];
-						ret[4] = li[2]+tmp;
+						ret[4] = li[2]+argument;
 					}
 				}else {
 					if(li.length == 1) {
-						ret[4] = li[0]+tmp;
+						if(classType.get(0).equals("enum")) {
+							ret[5] = comment;
+							ret[3] = "enum";
+							ret[4] = li[0]+tmp;
+							addFiled(ret);
+							return;
+						}
+						ret[4] = li[0]+argument;
 					}
 					else {
 						ret[3] = li[0];
-						ret[4] = li[1]+tmp;
+						ret[4] = li[1]+argument;
 					}
 				}
 				ret[5] = comment;
@@ -106,18 +140,19 @@ public class ClassElements {
 
 			}
 		}
+
 		//フィールド
 		else {
 			line = line.replace(";", "");
 			//[修飾子,isStatic,isfinal,型,フィールド名,コメント]
 			String[] ret= {"","","","","",""};
-			if(line.contains("static")) {
+			if(line.contains("static ")) {
 				ret[1] = "true";
 				line = line.replace("static", "");
 			}else {
 				ret[1] = "false";
 			}
-			if(line.contains("final")) {
+			if(line.contains("final ")) {
 				ret[2] = "true";
 				line = line.replace("final", "");
 			}else {
@@ -128,10 +163,11 @@ public class ClassElements {
 				ret[0] = li[0];
 				ret[3] = li[1];
 				ret[4] = li[2];
-			}else if(classType.get(0).equals("enum") && li.length==1) {
-				String[] strs = li[0].split(",");
+			}else if(classType.get(0).equals("enum")) {
+				if(line.contains("("))
+					li = li[0].split(",");
 				String[] comments = {};
-				ret[0] = "enum";
+				ret[3] = "enum";
 				if(comment.contains("*/")) {
 					comments= comment.split("\\*/");
 					for(int i= 0; i <comments.length; i++)
@@ -143,9 +179,10 @@ public class ClassElements {
 					for(int i= 0; i <comments.length; i++)
 						comments[i] = "//"+comments[i];
 				}
-				for (int i = 0; i < strs.length;i++) {
+
+				for (int i = 0; i < li.length;i++) {
 					ret = ret.clone();
-					ret[4] = strs[i];
+					ret[4] = li[i].replace(",","");
 					if(comments.length > i)
 						ret[5] = comments[i];
 					addFiled(ret);
@@ -159,13 +196,6 @@ public class ClassElements {
 			ret[5] = comment;
 			addFiled(ret);
 		}
-		//確認用
-		/*
-		if(!true)
-			System.out.println("comment"+comment.replace("\n", "\\n"));
-		if(!true)
-			System.out.println(line.replace("\n", "\\n"));
-		*/
 	}
 
 	public void addClassType(String str) {

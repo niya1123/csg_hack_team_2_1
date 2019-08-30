@@ -1,4 +1,5 @@
-package code;
+package makeUxf;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +39,7 @@ public class CodesReader {
 		}
 		else{
 			String className = fileName.split(".java")[0];
-			System.out.println("ClassName is " + className);
+			//System.out.println("ClassName is " + className);
 			codes.put(className, new ClassElements());
 			makeCodes(filePaths, className);
 		}
@@ -57,10 +58,13 @@ public class CodesReader {
 			while((line = reader.readLine()) != null) {
 				String subLine="";
 				line = line.replace("\t", "");
-				if(line.equals(""))
+				if(line.equals("") || line.contains("@"))
 					continue;
 				while(!endKey(line)) {
-					line+="\n"+reader.readLine().replace("\t", "");
+					String at = reader.readLine();
+					if(at.contains("@"))
+						continue;
+					line+="\n"+at.replace("\t", "");
 				}
 				if(line.replace(" ","").replace("\n", "").equals("}"))
 					break;
@@ -113,7 +117,7 @@ public class CodesReader {
 	 */
 	private void setArrow() {
 		for(String className : codes.keySet()) {
-			System.out.println("Arrows:"+className);
+			//System.out.println("Arrows:"+className);
 			ClassElements ce = codes.get(className);
 			String[] ret = new String[2];
 			ret[0] = className;
@@ -146,6 +150,20 @@ public class CodesReader {
 			}
 		}
 	}
+	public void arrowsshow() {
+		System.out.println();
+		for(String[] st: extendsArrows) {
+			System.out.println("継承関係: "+st[0]+" ---▷ "+st[1]);
+		}
+		System.out.println();
+		for(String[] st: implementsArrows) {
+			System.out.println("実装関係: "+st[0]+" - -▷ "+st[1]);
+		}
+		System.out.println();
+		for(String[] st: transferArrows) {
+			System.out.println("委譲関係: "+st[0]+" ---◆ "+st[1]);
+		}
+	}
 
 	public void allCodesShow() {
 
@@ -154,15 +172,7 @@ public class CodesReader {
 			codes.get(st).showClassElements();
 			System.out.println();
 		}
-		for(String[] st: extendsArrows) {
-			System.out.println("継承関係"+st[0]+"->"+st[1]);
-		}
-		for(String[] st: implementsArrows) {
-			System.out.println("実装関係"+st[0]+"->"+st[1]);
-		}
-		for(String[] st: transferArrows) {
-			System.out.println("委譲関係"+st[0]+"->"+st[1]);
-		}
+		arrowsshow();
 	}
 
 	public ArrayList<String[]> getExtendsArrows() {
