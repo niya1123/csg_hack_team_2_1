@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Do",
+            "request": "launch",
+            "mainClass": "makeUxf.Do"
+        }
+    ]
+}
