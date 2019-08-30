@@ -57,15 +57,15 @@ public class ClassElements {
 			//[修飾子,isStatic,isAbstact,型,引数含むメソッド名,コメント]
 			if(line.contains("(")) {
 				String[] ret= {"","","","","",""};
-				if(line.contains("static")) {
+				if(line.contains("static ")) {
 					ret[1] = "true";
-					line = line.replace("static", "");
+					line = line.replace("static ", "");
 				}else {
 					ret[1] = "false";
 				}
-				if(line.contains("abstract")) {
+				if(line.contains("abstract ")) {
 					ret[2] = "true";
-					line = line.replace("abstract", "");
+					line = line.replace("abstract ", "");
 				}else {
 					ret[2] = "false";
 				}
@@ -93,33 +93,34 @@ public class ClassElements {
 				argument = "("+argument+")";
 
 
-				String[] li = line.trim().replaceAll(" +", " ").split(" ");
+				String access="";
+				if(line.contains("public "))
+					access = "public";
+				else if(line.contains("private "))
+					access = "private";
+				else if(line.contains("protected"))
+					access = "protected";
+				line = line.replace(access, "");
 
-				if("public private protected".contains(li[0])) {
-					if(li.length == 2) {
-						ret[0] = li[0];
-						ret[4] = li[1]+argument;
+				String[] li = line.trim().replaceAll(" +", " ").split(" ");
+				ret[0] = access;
+				if(li.length == 1) {
+					if(classType.get(0).equals("enum")) {
+						ret[5] = comment;
+						ret[3] = "enum";
+						ret[4] = li[0]+tmp;
+						addFiled(ret);
+						return;
 					}
-					else {
-						ret[0] = li[0];
-						ret[3] = li[1];
-						ret[4] = li[2]+argument;
+					ret[4] = li[0]+argument;
+				}
+				else {
+					String type = "";
+					for (int i = 0; i < li.length-1; i++) {
+						type += li[i];
 					}
-				}else {
-					if(li.length == 1) {
-						if(classType.get(0).equals("enum")) {
-							ret[5] = comment;
-							ret[3] = "enum";
-							ret[4] = li[0]+tmp;
-							addFiled(ret);
-							return;
-						}
-						ret[4] = li[0]+argument;
-					}
-					else {
-						ret[3] = li[0];
-						ret[4] = li[1]+argument;
-					}
+					ret[3] = type;
+					ret[4] = li[li.length-1]+argument;
 				}
 				ret[5] = comment;
 				addMethod(ret);
@@ -158,12 +159,18 @@ public class ClassElements {
 			}else {
 				ret[2] = "false";
 			}
+			String access="";
+			if(line.contains("public "))
+				access = "public";
+			else if(line.contains("private "))
+				access = "private";
+			else if(line.contains("protected"))
+				access = "protected";
+			line = line.replace(access, "");
 			String[] li = line.trim().replaceAll(" +", " ").split(" ");
-			if("public private protected".contains(li[0])) {
-				ret[0] = li[0];
-				ret[3] = li[1];
-				ret[4] = li[2];
-			}else if(classType.get(0).equals("enum")) {
+			ret[0] = access;
+
+			if(classType.get(0).equals("enum")) {
 				if(line.contains("("))
 					li = li[0].split(",");
 				String[] comments = {};
@@ -190,8 +197,12 @@ public class ClassElements {
 				return;
 			}
 			else {
-				ret[3] = li[0];
-				ret[4] = li[1];
+				String type = "";
+				for (int i = 0; i < li.length-1; i++) {
+					type += li[i];
+				}
+				ret[3] = type;
+				ret[4] = li[li.length-1];
 			}
 			ret[5] = comment;
 			addFiled(ret);
